@@ -77,19 +77,30 @@ namespace StudentExerciseMVC.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT s.Id,
+
+                   cmd.CommandText = @"SELECT s.Id,
                                                s.First_Name,
                                                s.Last_Name,
                                                s.Slack_Handle,
                                                s.Cohort_id,
-                                               c.Cohort_Name AS CohortName
-                                          FROM students s
+                                               c.Cohort_Name AS CohortName,
+                                               e.Exercise_Name,
+                                               e.Exercise_Language
+                                                 FROM students s
                                                LEFT JOIN Cohort c ON s.Cohort_id = c.Id
-                                              WHERE s.Id = @Id;";
+                                               LEFT JOIN Exercise e ON s.id = e.Id
+                                              WHERE e.Id = @Id
+                                               select se.StudentId,
+                                               se.ExerciseId
+                                               from StudentExercise se
+                                               LEFT JOIN students st ON st.id = se.StudentId
+                                               WHERE se.StudentId = @Id;";
+
                     cmd.Parameters.Add(new SqlParameter("@Id", Id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     Student student = null;
+                    Exercise Exercise = null;
                     if (reader.Read())
                     {
                         student = new Student
@@ -99,6 +110,12 @@ namespace StudentExerciseMVC.Controllers
                             LastName = reader.GetString(reader.GetOrdinal("Last_Name")),
                             SlackHandle = reader.GetString(reader.GetOrdinal("Slack_Handle")),
                             CohortId = reader.GetInt32(reader.GetOrdinal("Cohort_id")),
+
+                            Exercise = new Exercise
+                            {
+                                Name = reader.GetString(reader.GetOrdinal("Exercise_Name")),
+                                Language = reader.GetString(reader.GetOrdinal("Exercise_Language"))
+                            },
                             Cohort = new Cohort
                             {
                                 Name = reader.GetString(reader.GetOrdinal("CohortName")),

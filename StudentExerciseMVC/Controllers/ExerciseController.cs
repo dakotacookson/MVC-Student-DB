@@ -7,11 +7,11 @@ using System.Data.SqlClient;
 
 namespace StudentExerciseMVC.Controllers
 {
-    public class ExersizeController : Controller
+    public class ExerciseController : Controller
     {
         private readonly IConfiguration _configuration;
 
-        public ExersizeController(IConfiguration configuration)
+        public ExerciseController(IConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -185,78 +185,46 @@ namespace StudentExerciseMVC.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public ActionResult Create()
+        {
+            Exercise exersize2 = new Exercise();
+            return View();
+        }
+
+        // POST: Students/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+
+        public ActionResult Create(Exercise exersize2)
+        {
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
 
 
-        //        public ActionResult Create()
-        //        {
-        //            StudentCreateViewModel viewModel =
-        //                new StudentCreateViewModel(_configuration.GetConnectionString("DefaultConnection"));
-        //            return View(viewModel);
-        //        }
+                        cmd.CommandText = @"INSERT INTO Exercise (Exercise_Name, Exercise_Language)
+                                                     VALUES (@Exercise_Name, @Exercise_Language)";
 
-        //        // POST: Students/Create
-        //        [HttpPost]
-        //        [ValidateAntiForgeryToken]
-        //        public ActionResult Create(StudentCreateViewModel viewModel)
-        //        {
-        //            try
-        //            {
-        //                using (SqlConnection conn = Connection)
-        //                {
-        //                    conn.Open();
-        //                    using (SqlCommand cmd = conn.CreateCommand())
-        //                    {
-        //                        cmd.CommandText = @"INSERT INTO students (First_Name, Last_Name, Slack_Handle, Cohort_id)
-        //                                             VALUES (@First_Name, @Last_Name, @Slack_Handle, @Cohort_id)";
-
-        //                        cmd.Parameters.Add(new SqlParameter("@First_Name", viewModel.Student.FirstName));
-        //                        cmd.Parameters.Add(new SqlParameter("@Last_Name", viewModel.Student.LastName));
-        //                        cmd.Parameters.Add(new SqlParameter("@Slack_Handle", viewModel.Student.SlackHandle));
-        //                        cmd.Parameters.Add(new SqlParameter("@Cohort_id", viewModel.Student.CohortId));
-
-        //                        cmd.ExecuteNonQuery();
-
-        //                        return RedirectToAction(nameof(Index));
-        //                    }
-        //                }
-        //            }
-        //            catch
-        //            {
-
-        //                return View();
-        //            }
-        //        }
+                        cmd.Parameters.Add(new SqlParameter("@Exercise_Name", exersize2.Name));
+                        cmd.Parameters.Add(new SqlParameter("@Exercise_Language", exersize2.Language));
 
 
+                        cmd.ExecuteNonQuery();
 
-        //        private List<Cohort> GetAllCohorts()
-        //        {
-        //            using (SqlConnection conn = Connection)
-        //            {
-        //                conn.Open();
-        //                using (SqlCommand cmd = conn.CreateCommand())
-        //                {
-        //                    cmd.CommandText = @"SELECT Id, Cohort_Name from Cohort;";
-        //                    SqlDataReader reader = cmd.ExecuteReader();
+                    }
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch
+            {
 
-        //                    List<Cohort> cohorts = new List<Cohort>();
-
-        //                    while (reader.Read())
-        //                    {
-        //                        cohorts.Add(new Cohort
-        //                        {
-        //                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-        //                            Name = reader.GetString(reader.GetOrdinal("Cohort_Name"))
-        //                        });
-        //                    }
-        //                    reader.Close();
-
-        //                    return cohorts;
-        //                }
-        //            }
-
-        //        }
-
+                return View();
+            }
+        }
 
         //        // GET: Instructors/Edit/5
         //        public ActionResult Edit(int id)
@@ -314,6 +282,6 @@ namespace StudentExerciseMVC.Controllers
 
     }
 
-        }
+}
 
 
